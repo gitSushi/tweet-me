@@ -1,3 +1,7 @@
 {
-  "python.pythonPath": "C:\\Users\\jo\\.virtualenvs\\tweetme2-_JdkRtUu\\Scripts\\python.exe"
+  "python.pythonPath": "C:\\Users\\jo\\.virtualenvs\\tweetme2-_JdkRtUu\\Scripts\\python.exe",
+  "python.linting.pylintArgs": [
+    "--disable=C0111", // missing docstring
+    "--load-plugins=pylint_django,pylint_celery",
+ ],
 }
