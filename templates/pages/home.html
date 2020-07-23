@@ -6,20 +6,57 @@
 
 {% block content %}
   Welcome to TweetMe 2
+
+  <div id="tweets">
+    Replace me
+  </div>
   
   <script>
+    const tweetsElement = document.querySelector('#tweets');
+    tweetsElement.innerHTML = "Loading ...";
+
     const xhr = new XMLHttpRequest();
     const method = 'GET';
     const url = "/tweets";
     const responseType = "json";
 
+    function handleDidLike(tweetId, currentCount){
+      const res = {
+        tweetId,
+        currentCount
+      }
+      console.log(res);
+    }
+
+    function likeBtn(tweet){  
+      // DO NOT INVOKE IN JS BUT IN HTML STRING OTHERWISE IT'LL ACTUALLY INVOKE BEFORE IT IS CLICKED
+      return `<button class="btn btn-primary btn-sm" onclick="handleDidLike(${
+        tweet.id
+        }, ${tweet.likes})">${tweet.likes} Likes</button>`;
+    }
+
+    function formatTweetElt(tweet){
+      let formattedTweet = `<div class="mb-4 tweet" id="tweet-id-${tweet.id}"><p>${
+        tweet.content
+        }</p><div class="btn btn-group">${likeBtn(tweet)}</div></div>`;
+      return formattedTweet;
+    }
     xhr.responseType = responseType;
     xhr.open(method, url);
     xhr.onload = function(){
-        console.log(xhr.response);
+        // console.log(xhr.response);
         const serverResponse = xhr.response;
         let listedItems = serverResponse.response;
-        console.log(listedItems);
+        // console.log(listedItems);
+
+        let finalTweetStr = "";
+        for(let i = 0; i < listedItems.length; i++){
+          // console.log(listedItems[i]);
+          let tweetObj = listedItems[i];
+          let currentItem = formatTweetElt(tweetObj);
+          finalTweetStr += currentItem;
+        }
+        tweetsElement.innerHTML = finalTweetStr;
     };
     xhr.send();
   </script>
