@@ -3,6 +3,8 @@ from django.db import models
 class Tweet(models.Model):
   '''
   These object's properties are the only ones django will accept to save() in db.sqlite3
+  or
+  maps to SQL data
   '''
   # also blank and null in case we tweet only an img
   content = models.TextField(blank=True, null=True)
