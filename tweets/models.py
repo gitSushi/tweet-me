@@ -1,4 +1,5 @@
 from django.db import models
+import random
 
 class Tweet(models.Model):
   '''
@@ -11,3 +12,16 @@ class Tweet(models.Model):
   # a path to image is stored here, not img itself
   # blank means not required in Django and null means not required in the database
   image = models.FileField(upload_to='images/', blank=True, null=True)
+
+  class Meta:
+    '''
+    onload all tweets newest to oldest
+    '''
+    ordering = ['-id']
+
+  def serialize(self):
+    return {
+      "id": self.id,
+      "content": self.content,
+      "likes": random.randint(0, 373),
+    }

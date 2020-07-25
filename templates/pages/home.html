@@ -14,9 +14,10 @@
   <div class="row mb-4">
     <div class="col-10 col-md-4 mx-auto">
       <form method="POST" action="/create-tweet" id="tweet-create-form" class="form"> {% csrf_token %}
+      <div id="tweet-create-form-error" class="d-none alert alert-danger"></div>
         {% comment %} Redirects to homepage {% endcomment %}
         <input type="hidden" value="/" name="next" />
-        <textarea class="form-control" name="content" placeholder="Your tweet ..."></textarea>
+        <textarea required class="form-control" name="content" placeholder="Your tweet ..."></textarea>
         <button type="submit" class="btn btn-secondary">Tweet</button>
       </form>
     </div>
@@ -29,6 +30,18 @@
   <script>
     const tweetCreateFormEl = document.querySelector('#tweet-create-form');
 
+    function handleTweetFormError(msg, display){
+      const myErrorDiv = document.querySelector('#tweet-create-form-error');
+      if(display === true){
+        // show error
+        myErrorDiv.setAttribute("class", "d-block alert alert-danger");
+        myErrorDiv.innerText = msg;
+      }else{
+        // hide error
+        myErrorDiv.setAttribute("class", "d-none alert alert-danger");
+      }
+    }
+
     function handleTweetCreateFormSubmit(event){
       event.preventDefault();
       const myForm = event.target;
@@ -39,21 +52,77 @@
       const url = myForm.getAttribute('action');
       const method = myForm.getAttribute('method');
       const xhr = new XMLHttpRequest();
+      /*
+       * Avoids having to JSON.parse the response
+       */
+      const responseType = "json";
+      xhr.responseType = responseType;
       xhr.open(method, url);
+      /*
+      doc :
+      https://docs.djangoproject.com/en/3.0/ref/request-response/#django.http.HttpRequest.is_ajax
+      https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/setRequestHeader
+      */
+      xhr.setRequestHeader('HTTP_X_REQUESTED_WITH', 'XMLHttpRequest');
+      xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
       xhr.onload = function(){
-        const serverResponse = xhr.response;
-        // receives the hompage from views redirect
-        // console.log(serverResponse);
-        const tweetsElement = document.querySelector('#tweets');
-        loadTweets(tweetsElement);
+        // const serverResponse = xhr.response;
+        /*
+         * receives the hompage from views redirect
+         */
+        // console.log(xhr.status, serverResponse);
+        /*
+        const tweetsContainerElement = document.querySelector('#tweets');
+        loadTweets(tweetsContainerElement);
+        */
+        /*
+         * instead of reloading all
+         */
+         if(xhr.status === 201){
+           handleTweetFormError("", false)
+           const newTweetJson = xhr.response;
+           const newTweetElt = formatTweetElt(newTweetJson);
+           // console.log(newTweetElt);
+           /*
+            * prepend
+            */
+           const ogHtml = tweetsContainerElement.innerHTML;
+           tweetsContainerElement.innerHTML = newTweetElt + ogHtml;
+           myForm.reset();
+         }
+         else if(xhr.status === 400){
+           const errorJson = xhr.response;
+           // console.log(xhr.status);
+           // console.log(errorJson);
+
+           const contentError = errorJson.content;
+           let contentErrorMsg;
+           if(contentError){
+             contentErrorMsg = contentError[0];
+             if(contentErrorMsg){
+               handleTweetFormError(contentErrorMsg, true)
+             }else{
+               alert("An error occured. PTA")
+              }
+           }else{
+             alert("An error occured. Please Try Again : PTA")
+           }
+           // console.log(contentErrorMsg);
+         }
+          else if(xhr.status === 500){
+            alert("Server error : Please try again")
+          }
+      }
+      xhr.onerror = function(){
+        alert("A error occured. (e.g. localserver isn't running) Please try again later.")
       }
       xhr.send(myFormData);
     }
 
     tweetCreateFormEl.addEventListener('submit', handleTweetCreateFormSubmit);
 
-    const tweetsElement = document.querySelector('#tweets');
-    tweetsElement.innerHTML = "Loading ...";
+    const tweetsContainerElement = document.querySelector('#tweets');
+    tweetsContainerElement.innerHTML = "Loading ...";
 
     function loadTweets(tweetsEl){
       const xhr = new XMLHttpRequest();
@@ -81,14 +150,14 @@
       xhr.send();
     }
 
-    loadTweets(tweetsElement);
+    loadTweets(tweetsContainerElement);
 
     function handleDidLike(tweetId, currentCount){
       const res = {
         tweetId,
         currentCount
       }
-      console.log(res);
+      // console.log(res);
     }
 
     function likeBtn(tweet){  
