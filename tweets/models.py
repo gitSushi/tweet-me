@@ -1,5 +1,8 @@
 from django.db import models
+from django.conf import settings
 import random
+
+User = settings.AUTH_USER_MODEL
 
 class Tweet(models.Model):
   '''
@@ -12,6 +15,24 @@ class Tweet(models.Model):
   # a path to image is stored here, not img itself
   # blank means not required in Django and null means not required in the database
   image = models.FileField(upload_to='images/', blank=True, null=True)
+  '''
+  # on_delete=models... means :
+  #if user deleted -> 
+
+  # ...CASCADE means :
+  # all this user's tweets are also deleted
+
+  # null=True, ...SET_NULL means :
+  # tweets are kept and set user to null
+  '''
+  user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+  '''
+  # in admin would list tweets by content instead of Tweet object (id)
+  # string represention of the object
+  def __str__(self):
+    return self.content
+  '''
 
   class Meta:
     '''
