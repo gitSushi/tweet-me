@@ -78,40 +78,44 @@
         /*
          * instead of reloading all
          */
-         if(xhr.status === 201){
-           handleTweetFormError("", false)
-           const newTweetJson = xhr.response;
-           const newTweetElt = formatTweetElt(newTweetJson);
-           // console.log(newTweetElt);
-           /*
-            * prepend
-            */
-           const ogHtml = tweetsContainerElement.innerHTML;
-           tweetsContainerElement.innerHTML = newTweetElt + ogHtml;
-           myForm.reset();
-         }
-         else if(xhr.status === 400){
-           const errorJson = xhr.response;
-           // console.log(xhr.status);
-           // console.log(errorJson);
+        if(xhr.status === 201){
+          handleTweetFormError("", false)
+          const newTweetJson = xhr.response;
+          const newTweetElt = formatTweetElt(newTweetJson);
+          // console.log(newTweetElt);
+          /*
+           * prepend
+           */
+          const ogHtml = tweetsContainerElement.innerHTML;
+          tweetsContainerElement.innerHTML = newTweetElt + ogHtml;
+          myForm.reset();
+        }
+        else if(xhr.status === 400){
+          const errorJson = xhr.response;
+          // console.log(xhr.status);
+          // console.log(errorJson);
 
-           const contentError = errorJson.content;
-           let contentErrorMsg;
-           if(contentError){
-             contentErrorMsg = contentError[0];
-             if(contentErrorMsg){
-               handleTweetFormError(contentErrorMsg, true)
-             }else{
-               alert("An error occured. PTA")
-              }
-           }else{
-             alert("An error occured. Please Try Again : PTA")
-           }
-           // console.log(contentErrorMsg);
-         }
-          else if(xhr.status === 500){
-            alert("Server error : Please try again")
+          const contentError = errorJson.content;
+          let contentErrorMsg;
+          if(contentError){
+            contentErrorMsg = contentError[0];
+            if(contentErrorMsg){
+              handleTweetFormError(contentErrorMsg, true)
+            }else{
+              alert("An error occured. PTA")
+            }
+          }else{
+            alert("An error occured. Please Try Again : PTA")
           }
+          // console.log(contentErrorMsg);
+        }
+        else if(xhr.status === 401){
+          alert("You must log in !")
+          window.location.href = '/login';
+        }
+        else if(xhr.status === 500){
+          alert("Server error : Please try again")
+        }
       }
       xhr.onerror = function(){
         alert("A error occured. (e.g. localserver isn't running) Please try again later.")

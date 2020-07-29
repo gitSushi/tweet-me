@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404, JsonResponse
 from django.utils.http import is_safe_url
+from django.conf import settings
 import random
 
-from django.conf import settings
+from .serializers import TweetSerializer
 
 from .models import Tweet
 from .forms import TweetForm
@@ -64,12 +65,33 @@ def tweet_detail_view(request, tweet_id, *args, **kwargs):
   return JsonResponse(data, status=status)
 
 def tweet_create_view(request, *args, **kwargs):
+  serializer = TweetSerializer(data=request.POST or None)
+  if serializer.is_valid():
+    serializer.save(user = request.user)
+    return JsonResponse(serializer.data, status=201)
+  return JsonResponse({}, status=400)
+
+def tweet_create_view_pure_django(request, *args, **kwargs):
+  '''
+  REST API Create view -> Django REST Framework
+  '''
+  '''
+  25 lines of code just to create one object of only Create in a CRUD
+  DRF is going to simplify that
+  '''
+  user = request.user
+  if not request.user.is_authenticated:
+    user = None
+    if request.is_ajax:
+      return JsonResponse({}, status=401)
+    return redirect(settings.LOGIN_URL)
   # django has a way to tell if a request is ajax
   # print('is_ajax : ', request.is_ajax())
   form = TweetForm(request.POST or None)
   next_url = request.POST.get('next' or None)
   if form.is_valid():
     obj = form.save(commit=False)
+    obj.user = user
     obj.save()
     if request.is_ajax:
       return JsonResponse(obj.serialize(), status=201) # 201 == created items
