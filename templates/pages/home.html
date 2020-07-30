@@ -113,6 +113,10 @@
           alert("You must log in !")
           window.location.href = '/login';
         }
+        else if(xhr.status === 403){
+          alert("You must log in !")
+          window.location.href = '/login';
+        }
         else if(xhr.status === 500){
           alert("Server error : Please try again")
         }
@@ -139,7 +143,9 @@
       xhr.onload = function(){
           // console.log(xhr.response);
           const serverResponse = xhr.response;
-          let listedItems = serverResponse.response;
+          /* Following was for pure django */
+          // let listedItems = serverResponse.response;
+          let listedItems = serverResponse;
           // console.log(listedItems);
 
           let finalTweetStr = "";

@@ -1,9 +1,11 @@
 1. Tweets
+    -> User Permissions
     -> Creating
         -> Text
         -> Image -> Media Storage Server
     -> Delete
     -> Retweeting
+    -> Un/Liking
 
 2. Users
     -> Register
