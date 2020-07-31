@@ -9,7 +9,7 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
 
-from .serializers import TweetSerializer
+from .serializers import TweetSerializer, TweetActionSerializer
 
 from .models import Tweet
 from .forms import TweetForm
@@ -66,6 +66,49 @@ def tweet_delete_view(request, tweet_id, *args, **kwargs):
     return Response({"message": "You cannot delete this tweet"}, status=401)
   obj = qs.first()
   obj.delete()
+  return Response({"message": "Tweet removed"}, status=200)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def tweet_action_view(request, *args, **kwargs):
+  '''
+  Id is required -> new serializer
+  Action options : like, unlike, retweet
+  '''
+  serializer = TweetActionSerializer(data=request.data)
+  if serializer.is_valid(raise_exception=True):
+    data = serializer.validated_data
+    tweet_id = data.get("id")
+    action = data.get("action")
+    qs = Tweet.objects.filter(id=tweet_id)
+    if not qs.exists():
+      return Response({}, status=404)
+    obj = qs.first()
+    if action == "like":
+      obj.likes.add(request.user)
+      serializer = TweetSerializer(obj)
+      return Response(serializer.data, status=200)
+    elif action == "unlike":
+      obj.likes.remove(request.user)
+    elif action == "retweet":
+      # TODO
+      pass
+  return Response({}, status=200)
+
+'''
+To avoid mutiple clicks (requests) use the tweet_action instead
+'''
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def tweet_like_toggle_view(request, tweet_id, *args, **kwargs):
+  qs = Tweet.objects.filter(id=tweet_id)
+  if not qs.exists():
+    return Response({}, status=404)
+  obj = qs.first()
+  if request.user in obj.likes.all():
+    obj.likes.remove(request.user)
+  else:
+    obj.likes.add(request.user)
   return Response({"message": "Tweet removed"}, status=200)
 
 '''
