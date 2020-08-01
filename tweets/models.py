@@ -16,6 +16,10 @@ class Tweet(models.Model):
   or
   maps to SQL data
   '''
+  # for retweet
+  # ref to same model you're working on self as a string
+  # similar to ref to a later model like "Tweet" in TweetLike
+  parent = models.ForeignKey("self", null=True, on_delete=models.SET_NULL)
   # also blank and null in case we tweet only an img
   content = models.TextField(blank=True, null=True)
   likes = models.ManyToManyField(User, related_name='tweet_user', blank=True, through=TweetLike)
