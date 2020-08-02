@@ -52,9 +52,15 @@ class Tweet(models.Model):
     '''
     ordering = ['-id']
 
+  @property
+  def is_retweet(self):
+    return self.parent != None
+
+'''
   def serialize(self):
     return {
       "id": self.id,
       "content": self.content,
       "likes": random.randint(0, 373),
     }
+'''

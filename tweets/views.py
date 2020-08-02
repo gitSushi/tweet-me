@@ -9,7 +9,11 @@ from rest_framework.decorators import api_view, permission_classes, authenticati
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import SessionAuthentication
 
-from .serializers import TweetSerializer, TweetActionSerializer
+from .serializers import (
+  TweetSerializer,
+  TweetActionSerializer,
+  TweetCreateSerializer
+  )
 
 from .models import Tweet
 from .forms import TweetForm
@@ -32,7 +36,7 @@ def home_view (request, *args, **kwargs):
 # @authentication_classes([SessionAuthentication])
 @permission_classes([IsAuthenticated]) # check REST API course for more
 def tweet_create_view(request, *args, **kwargs):
-  serializer = TweetSerializer(data=request.POST)
+  serializer = TweetCreateSerializer(data=request.POST)
   if serializer.is_valid(raise_exception=True):
     serializer.save(user = request.user)
     # return JsonResponse(serializer.data, status=201)
