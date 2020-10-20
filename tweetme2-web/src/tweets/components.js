@@ -1,14 +1,62 @@
-import React, { useEffect, useState } from "react";
+import React, { createRef, useEffect, useState } from "react";
 import { loadTweets } from "../lookup";
 
-export function TweetList() {
+export function TweetsComponent(props) {
+  const textareaRef = createRef();
+  const [newTweets, setNewTweets] = useState([]);
+  const handleSubmit = event => {
+    event.preventDefault();
+    const newValue = textareaRef.current.value;
+    let tempNewTweets = [...newTweets];
+    tempNewTweets.unshift({
+      content: newValue,
+      likes: 0,
+      id: 46453
+    });
+    setNewTweets(tempNewTweets);
+    textareaRef.current.value = "";
+  };
+  return (
+    <div className={props.className}>
+      <div className="col-12 mb-3">
+        <form onSubmit={handleSubmit}>
+          <textarea
+            ref={textareaRef}
+            required
+            className="form-control"
+            name="tweet"
+          />
+          <button type="submit" className="btn btn-primary my-3">
+            Tweet
+          </button>
+        </form>
+      </div>
+      <TweetList newTweets={newTweets} />
+    </div>
+  );
+}
+
+function TweetList(props) {
+  const [tweetsInit, setTweetsInit] = useState([]);
+
+  // Maybe useReducer instead
   const [tweets, setTweets] = useState([]);
+
+  useEffect(
+    () => {
+      const final = [...props.newTweets].concat(tweetsInit);
+      if (final.length !== tweets.length) {
+        setTweets(final);
+      }
+    },
+    [props.newTweets, tweets, tweetsInit]
+  );
 
   useEffect(() => {
     const myCallback = (response, status) => {
       // console.log(response, status);
       if (status === 200) {
-        setTweets(response);
+        setTweetsInit(response);
       }
     };
     loadTweets(myCallback);
@@ -30,14 +78,38 @@ export function TweetList() {
 
 function ActionBtn(props) {
   const { tweet, action } = props;
+
+  const [likes, setLikes] = useState(tweet.likes ? tweet.likes : 0);
+  // const [userLike, setUserLike] = useState(false);
+  const [userLike, setUserLike] = useState(
+    tweet.userLike === true ? true : false
+  );
+
   const className = props.className
     ? props.className
     : "btn btn-primary btn-sm";
-  return action.type === "like"
-    ? <button className={className}>
-        {tweet.likes} Likes
-      </button>
-    : null;
+  const actionDisplay = action.display ? action.display : "Action";
+  const display =
+    action.type === "like" ? `${likes} ${actionDisplay}` : actionDisplay;
+
+  const handleClick = event => {
+    event.preventDefault();
+    if (action.type === "like") {
+      if (userLike === true) {
+        setLikes(likes - 1);
+        setUserLike(false);
+      } else {
+        setLikes(likes + 1);
+        setUserLike(true);
+      }
+    }
+  };
+
+  return (
+    <button className={className} onClick={handleClick}>
+      {display}
+    </button>
+  );
 }
 
 function Tweet(props) {
@@ -51,7 +123,15 @@ function Tweet(props) {
         {tweet.id} - {tweet.content}
       </p>
       <div className="btn btn-group">
-        <ActionBtn tweet={tweet} action={{ type: "like" }} />
+        <ActionBtn tweet={tweet} action={{ type: "like", display: "Likes" }} />
+        <ActionBtn
+          tweet={tweet}
+          action={{ type: "unlike", display: "Unlike" }}
+        />
+        <ActionBtn
+          tweet={tweet}
+          action={{ type: "retweet", display: "Retweet" }}
+        />
       </div>
     </div>
   );
