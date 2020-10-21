@@ -36,7 +36,11 @@ def home_view (request, *args, **kwargs):
 # @authentication_classes([SessionAuthentication])
 @permission_classes([IsAuthenticated]) # check REST API course for more
 def tweet_create_view(request, *args, **kwargs):
-  serializer = TweetCreateSerializer(data=request.POST)
+  '''
+  Changed to -> to work with react
+  '''
+  # serializer = TweetCreateSerializer(data=request.POST)
+  serializer = TweetCreateSerializer(data=request.data)
   if serializer.is_valid(raise_exception=True):
     serializer.save(user = request.user)
     # return JsonResponse(serializer.data, status=201)

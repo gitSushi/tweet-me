@@ -1,21 +1,33 @@
 import React, { createRef, useEffect, useState } from "react";
-import { loadTweets } from "../lookup";
+import { apiTweetList, apiTweetCreate, apiTweetAction } from "./lookup";
 
 export function TweetsComponent(props) {
   const textareaRef = createRef();
   const [newTweets, setNewTweets] = useState([]);
+
+  /*
+   * backend API handler
+  */
+  const handleBackendUpdate = (response, status) => {
+    let tempNewTweets = [...newTweets];
+
+    if (status === 201) {
+      tempNewTweets.unshift(response);
+      setNewTweets(tempNewTweets);
+    } else {
+      console.log(response);
+      alert("An error occured please try again");
+    }
+  };
+
   const handleSubmit = event => {
     event.preventDefault();
     const newValue = textareaRef.current.value;
-    let tempNewTweets = [...newTweets];
-    tempNewTweets.unshift({
-      content: newValue,
-      likes: 0,
-      id: 46453
-    });
-    setNewTweets(tempNewTweets);
+
+    apiTweetCreate(newValue, handleBackendUpdate);
     textareaRef.current.value = "";
   };
+
   return (
     <div className={props.className}>
       <div className="col-12 mb-3">
@@ -38,6 +50,7 @@ export function TweetsComponent(props) {
 
 function TweetList(props) {
   const [tweetsInit, setTweetsInit] = useState([]);
+  const [tweetsDidSet, setTweetsDidSet] = useState(false);
 
   // Maybe useReducer instead
   const [tweets, setTweets] = useState([]);
@@ -52,20 +65,28 @@ function TweetList(props) {
     [props.newTweets, tweets, tweetsInit]
   );
 
-  useEffect(() => {
-    const myCallback = (response, status) => {
-      // console.log(response, status);
-      if (status === 200) {
-        setTweetsInit(response);
+  useEffect(
+    () => {
+      if (tweetsDidSet === false) {
+        const handleTweetListLookup = (response, status) => {
+          // console.log(response, status);
+          if (status === 200) {
+            setTweetsInit(response);
+            setTweetsDidSet(true);
+          } else {
+            alert("There was an error");
+          }
+        };
+        apiTweetList(handleTweetListLookup);
       }
-    };
-    loadTweets(myCallback);
-    /*
+      /*
     // both syntax work -> https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Working_with_Objects#Using_object_initializers
     let tweetItems = [{"content": 123}, {content: "Hi there"}]
     setTweets(tweetItems);
     */
-  }, []);
+    },
+    [tweetsDidSet, setTweetsDidSet]
+  );
 
   return tweets.map((tweet, index) =>
     <Tweet
@@ -81,9 +102,9 @@ function ActionBtn(props) {
 
   const [likes, setLikes] = useState(tweet.likes ? tweet.likes : 0);
   // const [userLike, setUserLike] = useState(false);
-  const [userLike, setUserLike] = useState(
-    tweet.userLike === true ? true : false
-  );
+  // const [userLike, setUserLike] = useState(
+  //   tweet.userLike === true ? true : false
+  // );
 
   const className = props.className
     ? props.className
@@ -92,17 +113,25 @@ function ActionBtn(props) {
   const display =
     action.type === "like" ? `${likes} ${actionDisplay}` : actionDisplay;
 
+  const handleActionBackendEvent = (response, status) => {
+    console.log(response, status);
+    if (status === 200) {
+      setLikes(response.likes);
+    }
+    // if (action.type === "like") {
+    //   if (userLike === true) {
+    //     setLikes(likes - 1);
+    //     setUserLike(false);
+    //   } else {
+    //     setLikes(likes + 1);
+    //     setUserLike(true);
+    //   }
+    // }
+  };
+
   const handleClick = event => {
     event.preventDefault();
-    if (action.type === "like") {
-      if (userLike === true) {
-        setLikes(likes - 1);
-        setUserLike(false);
-      } else {
-        setLikes(likes + 1);
-        setUserLike(true);
-      }
-    }
+    apiTweetAction(tweet.id, action.type, handleActionBackendEvent);
   };
 
   return (
