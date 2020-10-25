@@ -15,14 +15,16 @@ if (appEL) {
   );
 }
 
-const tweetEL = document.getElementById("tweetMe2");
-if (tweetEL) {
-  ReactDOM.render(
-    <React.StrictMode>
-      <TweetsComponent />
-    </React.StrictMode>,
-    tweetEL
-  );
+const tweetEl = document.getElementById("tweetMe2");
+if (tweetEl) {
+  const myComponent = React.createElement(TweetsComponent, tweetEl.dataset);
+  ReactDOM.render(myComponent, tweetEl);
+  // ReactDOM.render(
+  //   <React.StrictMode>
+  //     <myComponent />
+  //   </React.StrictMode>,
+  //   tweetEl
+  // );
 }
 
 // If you want your app to work offline and load faster, you can change
