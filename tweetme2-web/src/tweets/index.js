@@ -1,3 +1,3 @@
-import { TweetsComponent } from "./components";
+import { TweetsComponent, TweetDetailComponent } from "./components";
 
-export { TweetsComponent };
+export { TweetsComponent, TweetDetailComponent };

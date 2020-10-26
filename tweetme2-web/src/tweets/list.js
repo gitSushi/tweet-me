@@ -40,7 +40,7 @@ export function TweetList(props) {
     setTweets(tweetItems);
     */
     },
-    [tweetsDidSet, setTweetsDidSet, username]
+    [setTweetsInit, tweetsDidSet, setTweetsDidSet, username]
   );
 
   const handleDidRetweet = newTweet => {
@@ -58,7 +58,7 @@ export function TweetList(props) {
       <Tweet
         tweet={tweet}
         didRetweet={handleDidRetweet}
-        key={index}
+        key={`${index}-{tweet.id}`}
         className="my-5 py-4 border bg-white text-dark"
       />
     </div>
