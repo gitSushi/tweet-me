@@ -54,11 +54,10 @@ export function TweetList(props) {
   };
 
   return tweets.map((tweet, index) =>
-    <div className="col-12">
+    <div className="col-12" key={`${index}-{tweet.id}`}>
       <Tweet
         tweet={tweet}
         didRetweet={handleDidRetweet}
-        key={`${index}-{tweet.id}`}
         className="my-5 py-4 border bg-white text-dark"
       />
     </div>

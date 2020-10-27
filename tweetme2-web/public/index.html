@@ -31,12 +31,8 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
 
-
-    <div class="tweetme-2-detail" data-tweet-id="1" data-class-name="col-6 mx-auto"></div>
-    <div class="tweetme-2-detail" data-tweet-id="12" data-class-name="col-6 mx-auto"></div>
-    <div class="tweetme-2-detail" data-tweet-id="27" data-class-name="col-6 mx-auto"></div>
-
-    <div class="d-none" id="tweetMe2" data-chakachala="how very nonsensical" data-username="jo" data-can-tweet="false">
+    <div id="tweet-container"></div>
+    <div id="tweetMe2" data-chakachala="how very nonsensical" data-username="jo" data-can-tweet="false">
     </div>
 
     <!--
@@ -49,6 +45,21 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+
+    <script>
+      let path = window.location.pathname;
+      const regexId = /(?<tweetid>\d+)/;
+      const match = path.match(regexId);
+      // if (path !== "/") {
+      if (match) {
+        let tweetId = match.groups.tweetid;
+        const tweetme2El = document.querySelector('#tweetMe2');
+        tweetme2El.className = "d-none";
+        let tweetEl = `<div class="tweetme-2-detail" data-tweet-id="${tweetId}" data-class-name="col-6 mx-auto"></div>`;
+        const mainContainer = document.querySelector('#tweet-container');
+        mainContainer.innerHTML = tweetEl;
+      }
+    </script>
   </body>
 
 </html>
