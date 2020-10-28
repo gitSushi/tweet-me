@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     # internal
+    'accounts',
+    'profiles',
     'tweets',
 ]
 
@@ -133,14 +135,13 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static")
+    os.path.join(BASE_DIR, "static"),
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static-root")
 
-CORS_ALLOW_ALL_ORIGINS = True # any website has acces to my API
+CORS_ALLOW_ALL_ORIGINS = True  # any website has acces to my API
 CORS_URLS_REGEX = r'^/api/.*$'
-
 
 
 DEFAULT_RENDERER_CLASSES = [
@@ -158,7 +159,7 @@ if DEBUG:
     #     'tweetme2.rest_api.dev.DevAuthentication'
     # ]
 
-REST_FRAMEWORK = {   
+REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': DEFAULT_AUTHENTICATION_CLASSES,
     'DEFAULT_RENDERER_CLASSES': DEFAULT_RENDERER_CLASSES
 }

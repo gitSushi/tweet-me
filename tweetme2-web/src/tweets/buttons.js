@@ -19,7 +19,6 @@ export function ActionBtn(props) {
     action.type === "like" ? `${likes} ${actionDisplay}` : actionDisplay;
 
   const handleActionBackendEvent = (response, status) => {
-    console.log(response, status);
     if ((status === 200 || status === 201) && didPerformAction) {
       // setLikes(response.likes);
       didPerformAction(response);
@@ -33,6 +32,9 @@ export function ActionBtn(props) {
     //     setUserLike(true);
     //   }
     // }
+    if (status === 403) {
+      console.log(response, status);
+    }
   };
 
   const handleClick = event => {
